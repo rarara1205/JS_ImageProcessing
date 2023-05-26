@@ -49,22 +49,54 @@
 // inputImage.addEventListener('change', processImage);
 
 //画像のサイズ
-const imageSize = 500;
-
-//二値化の閾値
-const THRESHOLD = 128;
+let imageSize = getComputedStyle(document.querySelector(".outputImage")).width;
+imageSize = imageSize.substring(0, imageSize.length - 2);
 
 //canvas
 let canvas = document.createElement("canvas");
 
 //タグから要素取得
 let input = document.getElementById("inputImage");
+let returnSample = document.getElementById("returnSampleButton");
 let outputOrigin = document.getElementById("outputOrigin");
-let outputGlay = document.getElementById("outputGlay");
+let outputGray = document.getElementById("outputGray");
 let outputBinary = document.getElementById("outputBinary");
+let thresholdSlider = document.getElementById("thresholdSlider");
+let threshold = thresholdSlider.value;
+
+const sampleImgURL = outputOrigin.src;
+
+ResizeOriginImg(sampleImgURL, outputOrigin, imageSize);
+ProcessImage(sampleImgURL, outputGray, outputBinary);
+outputGray.onload = function(){
+    ResizeOtherImg(outputOrigin, outputGray);
+}
+outputBinary.onload = function(){
+    ResizeOtherImg(outputOrigin, outputBinary);
+}
 
 //変更した際に通知
 input.addEventListener("change", OutputImage);
+
+returnSample.addEventListener("click", Reset);
+
+thresholdSlider.addEventListener("input", ChageThreshold);
+
+function Reset(){
+    input.value = "";
+    outputOrigin.src = sampleImgURL;
+    outputOrigin.onload = function(){
+        ResizeOriginImg(sampleImgURL, outputOrigin, imageSize);
+        ProcessImage(sampleImgURL, outputGray, outputBinary);
+        outputGray.onload = function(){
+            ResizeOtherImg(outputOrigin, outputGray);
+        }
+        outputBinary.onload = function(){
+            ResizeOtherImg(outputOrigin, outputBinary);
+        }
+    }
+    
+}
 
 function OutputImage(){
     
@@ -82,10 +114,10 @@ function OutputImage(){
             
             ResizeOriginImg(e.target.result, outputOrigin, imageSize);
 
-            ProcessImage(e.target.result, outputGlay, outputBinary);
+            ProcessImage(e.target.result, outputGray, outputBinary);
             
-            outputGlay.onload = function(){
-                ResizeOtherImg(outputOrigin, outputGlay);
+            outputGray.onload = function(){
+                ResizeOtherImg(outputOrigin, outputGray);
             }
             outputBinary.onload = function(){
                 ResizeOtherImg(outputOrigin, outputBinary);
@@ -120,39 +152,60 @@ function ResizeOtherImg(originImg, targetImg){
     targetImg.height = originImg.height;
 }
 
-function ProcessImage(originURL, outputGlay, outputBinary){
+function ProcessImage(originURL, outputGray, outputBinary){
     let img = new Image();
     img.src = originURL;
-    let ctx = canvas.getContext("2d");
+    let ctx = canvas.getContext("2d", {willReadFrequently: true});
     canvas.width = img.width;
     canvas.height = img.height;
     ctx.drawImage(img, 0, 0);
     let imgOrigin = ctx.getImageData(0, 0, img.width, img.height);
-    let imgGlay = ctx.createImageData(img.width, img.height);
+    let imgGray = ctx.createImageData(img.width, img.height);
     let imgBinary = ctx.createImageData(img.width, img.height);
-    const CIE = [0.2126, 0.7152, 0.0722];
-    for(let i=0; i<imgOrigin.data.length; i+=4){
-        let y = CIE[0] * imgOrigin.data[i] + CIE[1] * imgOrigin.data[i+1] + CIE[2] * imgOrigin.data[i+2];
-        y = parseInt(y, 10);
-        imgGlay.data[i] = y;
-        imgGlay.data[i+1] = y;
-        imgGlay.data[i+2] = y;
-        imgGlay.data[i+3] = imgOrigin.data[i+3];
+    let imgOriginSize = imgOrigin.data.length;
+    for(let i=0; i<imgOriginSize; i+=4){
+        let y = Grayscale(imgOrigin.data[i], imgOrigin.data[i+1], imgOrigin.data[i+2]);
+        imgGray.data[i] = y;
+        imgGray.data[i+1] = y;
+        imgGray.data[i+2] = y;
+        imgGray.data[i+3] = imgOrigin.data[i+3];
 
-        if(y > THRESHOLD){
-            y = 255;
-        }
-        else{
-            y = 0;
-        }
+        y = y > threshold ? 255 : 0;
+
         imgBinary.data[i] = y;
         imgBinary.data[i+1] = y;
         imgBinary.data[i+2] = y;
         imgBinary.data[i+3] = imgOrigin.data[i+3];
     }
-    ctx.putImageData(imgGlay, 0, 0);
-    outputGlay.src = canvas.toDataURL();
+    ctx.putImageData(imgGray, 0, 0);
+    outputGray.src = canvas.toDataURL();
     ctx.putImageData(imgBinary, 0, 0);
     outputBinary.src = canvas.toDataURL();
 
+}
+
+function Grayscale(r, g, b){
+    return parseInt(0.2126*r + 0.7152*g + 0.0722*b, 10);
+}
+
+function ChageThreshold(){
+    threshold = thresholdSlider.value;
+    let img = new Image();
+    img.src = outputGray.src;
+    let ctx = canvas.getContext("2d", {willReadFrequently: true});
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    let imgGray = ctx.getImageData(0, 0, img.width, img.height);
+    let imgBinary = ctx.createImageData(img.width, img.height);
+    let imgGraySize = imgGray.data.length;
+    for(let i=0; i<imgGraySize; i+=4){
+        let color = imgGray.data[i] > threshold ? 255 : 0;
+        imgBinary.data[i] = color;
+        imgBinary.data[i+1] = color;
+        imgBinary.data[i+2] = color;
+        imgBinary.data[i+3] = imgGray.data[i+3];
+    }
+    ctx.putImageData(imgBinary, 0, 0);
+    outputBinary.src = canvas.toDataURL();
 }

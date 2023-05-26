@@ -7,9 +7,9 @@
     </title>
     <style>
       .outputImage{
-        background-color:black;
-        width: 500px;
-        height: 500px;
+        background-color:grey;
+        width: 200px;
+        height: 200px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -19,22 +19,27 @@
   <body>
     <div class="selectFile">
       <input type="file" id="inputImage" accept="image/*">
+      <button type="submit" id="returnSampleButton">リセット</button>
     </div>
     <div class="outputs">
       <div class="origin">
         <p>元の画像</p>
         <div class="outputImage">
-          <img id="outputOrigin"/>
+          <img id="outputOrigin" src="Mandrill.png"/>
         </div>
       </div>
       <div class="glayscale">
         <p>グレースケール化</p>
         <div class="outputImage">
-          <img id="outputGlay"/>
+          <img id="outputGray"/>
         </div>
       </div>
       <div class="binary">
         <p>二値化</p>
+        <label>
+          閾値
+          <input type="range" min="0" max="255" step="1" value="128" id="thresholdSlider">
+        </label>
         <div class="outputImage">
           <img id="outputBinary"/>
         </div>
