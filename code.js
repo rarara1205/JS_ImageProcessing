@@ -84,6 +84,8 @@ thresholdSlider.addEventListener("input", ChageThreshold);
 
 function Reset(){
     input.value = "";
+    thresholdSlider.value = 128;
+    threshold = 128;
     outputOrigin.src = sampleImgURL;
     outputOrigin.onload = function(){
         ResizeOriginImg(sampleImgURL, outputOrigin, imageSize);
@@ -209,3 +211,4 @@ function ChageThreshold(){
     ctx.putImageData(imgBinary, 0, 0);
     outputBinary.src = canvas.toDataURL();
 }
+
