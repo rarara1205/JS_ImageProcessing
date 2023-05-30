@@ -1,53 +1,4 @@
 
-// // 画像読み込み後の処理
-// function processImage() {
-//     var input = document.getElementById('inputImage');
-//     var output = document.getElementById('output');
-
-//     if (input.files && input.files[0]) {
-//         var reader = new FileReader();
-
-//         reader.onload = function(e) {
-//             var img = new Image();
-//             img.onload = function() {
-//                 // グレースケール変換
-//                 var canvas = document.createElement('canvas');
-//                 var ctx = canvas.getContext('2d');
-//                 canvas.width = img.width;
-//                 canvas.height = img.height;
-//                 ctx.drawImage(img, 0, 0);
-//                 var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-//                 var data = imageData.data;
-
-//                 for (var i = 0; i < data.length; i += 4) {
-//                     var r = data[i];
-//                     var g = data[i + 1];
-//                     var b = data[i + 2];
-//                     var brightness = (r + g + b) / 3;
-//                     data[i] = brightness;
-//                     data[i + 1] = brightness;
-//                     data[i + 2] = brightness;
-//                 }
-
-//                 ctx.putImageData(imageData, 0, 0);
-
-//                 // 処理後の画像を表示
-//                 var outputImg = new Image();
-//                 outputImg.src = canvas.toDataURL();
-//                 output.appendChild(outputImg);
-//             }
-
-//             img.src = e.target.result;
-//         }
-
-//         reader.readAsDataURL(input.files[0]);
-//     }
-// }
-
-// // 画像選択時に処理を実行
-// var inputImage = document.getElementById('inputImage');
-// inputImage.addEventListener('change', processImage);
-
 //画像のサイズ
 let imageSize = getComputedStyle(document.querySelector(".outputImage")).width;
 imageSize = imageSize.substring(0, imageSize.length - 2);
@@ -212,3 +163,35 @@ function ChageThreshold(){
     outputBinary.src = canvas.toDataURL();
 }
 
+function CreateBG(){
+    let ctx = canvas.getContext("2d", {willReadFrequently: true});
+    canvas.width = imageSize;
+    canvas.height = imageSize;
+    let imgBG = ctx.createImageData(imageSize, imageSize);
+    let division = 16;
+    division = imageSize/division;
+    let nowColor = 128;
+    let nextColor = 255;
+    for(let y=0; y<imageSize; y++){
+        if(y % division == 0){
+            [nowColor, nextColor] = [nextColor, nowColor];
+        }
+        for(let x=0; x<imageSize; x++){
+            let index = (x + y * imageSize) * 4;
+            if(x % division == 0){
+                [nowColor, nextColor] = [nextColor, nowColor];
+            }
+            imgBG.data[index] = nowColor;
+            imgBG.data[index+1] = nowColor;
+            imgBG.data[index+2] = nowColor;
+            imgBG.data[index+3] = 255;
+        }
+    }
+    ctx.putImageData(imgBG, 0, 0);
+    let elements = document.getElementsByClassName("outputImage");
+    for(i=0; i<elements.length; i++){
+        elements[i].style.backgroundImage = "url("+canvas.toDataURL()+")";
+    }
+}
+
+CreateBG();

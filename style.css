@@ -1,10 +1,62 @@
 @charset "utf-8";
+@import url('https://fonts.googleapis.com/css?family=Kosugi');
+
+body{
+    font-family: 'Kosugi', sans-serif;
+    background-color: #f8f7ee;
+    color: #353535;
+}
+
+h1{
+    position: relative;
+    padding: 1em 2em;
+    text-align: center;
+}
+
+h1::before,
+h1::after{
+    position: absolute;
+    content: '';
+}
+
+h1::after{
+    top: 1px;
+    left: 1px;
+    width: 50px;
+    height: 50px;
+    border-top: 5px solid #353535;
+    border-left: 5px solid #353535;
+}
+
+h1::before{
+    right: 0;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
+    border-right: 5px solid #353535;
+    border-bottom: 5px solid #353535;
+}
+
+.selectFile{
+    text-align: center;
+}
 
 .outputImage{
-    background-color:grey;
-    width: 200px;
-    height: 200px;
+    display: block;
+    width: 256px;
+    height: 256px;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+    margin: auto;
+}
+
+.selectList{
+    padding-top: 1em;
+    text-align: center;
+}
+
+.outputs{
+    text-align: center;
+    margin: auto;
+}
