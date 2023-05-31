@@ -15,21 +15,21 @@
       <input type="file" id="inputImage" accept="image/*">
       <button type="submit" id="returnSampleButton">リセット</button>
     </div>
-    <!-- <div class="selectList" >
+    <div class="select" >
       <select id="selectProcess">
-        <option value="default">処理方法を選択</option>
+        <option value="default" selected>処理方法を選択</option>
         <option value="origin">元画像</option>
         <option value="grayscale">グレースケール</option>
         <option value="binary">二値化</option>
       </select>
-    </div> -->
-    <div class="outputs">
-      <div class="origin">
-        <h3>元の画像</h3>
+    </div>
+    <div id="output">
+      <!-- <div class="origin"> -->
+        <!-- <h3>元の画像</h3> -->
         <div class="outputImage">
-          <img id="outputOrigin" src="IMG_Mandrill.png"/>
+          <img id="outputIMG" src="IMG_Mandrill.png"/>
         </div>
-      </div>
+      <!-- </div>
       <div class="grayscale">
         <h3>グレースケール化</h3>
         <div class="outputImage">
@@ -45,7 +45,7 @@
         <div class="outputImage">
           <img id="outputBinary"/>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <script type="text/javascript" src="code.js"></script>

@@ -51,12 +51,12 @@ h1::before{
     margin: auto;
 }
 
-.selectList{
+.select{
     padding-top: 1em;
     text-align: center;
 }
 
-.outputs{
+#output{
     text-align: center;
     margin: auto;
 }
